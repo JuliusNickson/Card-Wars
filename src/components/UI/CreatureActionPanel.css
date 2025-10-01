@@ -1,0 +1,125 @@
+.creature-action-panel {
+  position: fixed;
+  bottom: 120px; /* Position above the card bar */
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #34495e;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  min-width: 400px;
+}
+
+.panel-header {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.panel-header h3 {
+  margin: 0 0 5px 0;
+  color: #2c3e50;
+}
+
+.creature-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #8e44ad;
+  text-transform: capitalize;
+  margin-bottom: 5px;
+}
+
+.creature-stats {
+  font-size: 12px;
+  color: #7f8c8d;
+  margin-bottom: 5px;
+}
+
+.creature-archetype {
+  font-size: 11px;
+  color: #95a5a6;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.action-btn {
+  padding: 8px 16px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.move-btn {
+  background: #3498db;
+  color: white;
+  border-color: #2980b9;
+}
+
+.move-btn:hover:not(.disabled) {
+  background: #2980b9;
+  transform: translateY(-1px);
+}
+
+.move-btn.active {
+  background: #1abc9c;
+  border-color: #16a085;
+}
+
+.attack-btn {
+  background: #e74c3c;
+  color: white;
+  border-color: #c0392b;
+}
+
+.attack-btn:hover:not(.disabled) {
+  background: #c0392b;
+  transform: translateY(-1px);
+}
+
+.attack-btn.active {
+  background: #e67e22;
+  border-color: #d35400;
+}
+
+.cancel-btn {
+  background: #95a5a6;
+  color: white;
+  border-color: #7f8c8d;
+}
+
+.cancel-btn:hover {
+  background: #7f8c8d;
+  transform: translateY(-1px);
+}
+
+.action-btn.disabled {
+  background: #bdc3c7;
+  color: #7f8c8d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.action-btn.disabled:hover {
+  transform: none;
+}
+
+.action-hint {
+  text-align: center;
+  margin-top: 10px;
+  padding: 5px;
+  background: #ecf0f1;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #2c3e50;
+  font-style: italic;
+}

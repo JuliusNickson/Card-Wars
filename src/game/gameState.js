@@ -1,0 +1,1 @@
+// Current turn, mana, players, etc.

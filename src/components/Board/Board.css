@@ -1,0 +1,126 @@
+.board-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  background: #2c3e50;
+  min-height: calc(100vh - 200px);
+  gap: 40px;
+  flex: 1;
+}
+
+.hex-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: -15px; /* Vertical spacing for flat-topped hex tessellation */
+}
+
+.hex-row {
+  display: flex;
+  gap: -1px; /* Minimal horizontal gap for perfect tessellation */
+  align-items: center;
+}
+
+.hex-row.odd-row {
+  margin-left: 26px; /* Half the hex width (52px/2) for proper offset */
+}
+
+.hex-row.even-row {
+  margin-left: 0;
+}
+
+.board-info {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  color: white;
+  min-width: 250px;
+  backdrop-filter: blur(10px);
+}
+
+.board-info h3 {
+  margin: 0 0 15px 0;
+  color: #ecf0f1;
+  font-size: 1.2rem;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 8px;
+}
+
+.controlled-hexes {
+  margin-bottom: 30px;
+}
+
+.hex-counts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.player-hex-count {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.towers-status {
+  margin-top: 20px;
+}
+
+.tower-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tower-status {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  border-left: 4px solid;
+}
+
+.tower-status.player-A {
+  background: rgba(74, 144, 226, 0.2);
+  border-left-color: #4a90e2;
+}
+
+.tower-status.player-B {
+  background: rgba(231, 76, 60, 0.2);
+  border-left-color: #e74c3c;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .board-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .hex-grid {
+    transform: scale(0.8);
+  }
+  
+  .board-info {
+    min-width: auto;
+    width: 100%;
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 900px) {
+  .hex-grid {
+    transform: scale(0.6);
+  }
+}
+
+@media (max-width: 600px) {
+  .hex-grid {
+    transform: scale(0.5);
+  }
+  
+  .board-container {
+    padding: 10px;
+  }
+}

@@ -1,0 +1,113 @@
+.creature-card {
+  background: linear-gradient(145deg, #34495e, #2c3e50);
+  border: 2px solid #3498db;
+  border-radius: 10px;
+  padding: 12px;
+  width: 120px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  text-align: center;
+  position: relative;
+}
+
+.creature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(52, 152, 219, 0.3);
+  border-color: #5dade2;
+}
+
+.creature-card.selected {
+  border-color: #f1c40f;
+  background: linear-gradient(145deg, #f39c12, #e67e22);
+  box-shadow: 0 0 15px rgba(241, 196, 15, 0.6);
+  transform: translateY(-5px) scale(1.05);
+}
+
+.creature-card.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #7f8c8d;
+}
+
+.creature-card.disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.creature-card.error {
+  background: linear-gradient(145deg, #e74c3c, #c0392b);
+  border-color: #e74c3c;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.card-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  flex: 1;
+  text-align: left;
+}
+
+.mana-cost {
+  background: #3498db;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.creature-card.disabled .mana-cost {
+  background: #7f8c8d;
+}
+
+.creature-card.selected .mana-cost {
+  background: #e67e22;
+}
+
+.card-icon {
+  font-size: 2rem;
+  margin: 8px 0;
+}
+
+.card-stats {
+  display: flex;
+  justify-content: space-around;
+  margin: 8px 0;
+  padding: 4px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
+.stat-value {
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.card-description {
+  font-size: 0.7rem;
+  opacity: 0.9;
+  margin-top: 6px;
+  line-height: 1.2;
+}

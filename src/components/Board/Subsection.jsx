@@ -1,0 +1,1 @@
+// Group of 16 hexes (8x2)

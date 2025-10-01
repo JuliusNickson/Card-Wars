@@ -1,0 +1,120 @@
+.turn-phase-panel {
+  position: fixed;
+  top: 120px; /* Move down from top to avoid header */
+  right: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #34495e;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  min-width: 300px;
+  max-width: 350px;
+}
+
+.phase-header {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.phase-header h3 {
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+}
+
+.current-phase {
+  margin-bottom: 10px;
+}
+
+.phase-indicator {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 12px;
+  text-align: center;
+  display: inline-block;
+}
+
+.phase-upkeep {
+  background: #f39c12;
+  color: white;
+}
+
+.phase-main {
+  background: #27ae60;
+  color: white;
+}
+
+.phase-end {
+  background: #8e44ad;
+  color: white;
+}
+
+.phase-description {
+  font-size: 12px;
+  color: #7f8c8d;
+  text-align: center;
+  margin-bottom: 15px;
+  font-style: italic;
+}
+
+.actions-summary {
+  background: #ecf0f1;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.action-count {
+  font-size: 12px;
+  color: #2c3e50;
+  margin-bottom: 5px;
+}
+
+.mana-display {
+  font-size: 14px;
+  font-weight: bold;
+  color: #3498db;
+}
+
+.phase-controls {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.phase-advance-btn {
+  background: #2ecc71;
+  color: white;
+  border: 2px solid #27ae60;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.phase-advance-btn:hover {
+  background: #27ae60;
+  transform: translateY(-1px);
+}
+
+.upkeep-info,
+.end-phase-info {
+  background: #e8f6f3;
+  border: 1px solid #1abc9c;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 11px;
+  color: #16a085;
+}
+
+.upkeep-info div,
+.end-phase-info div {
+  margin-bottom: 3px;
+}
+
+.upkeep-info div:last-child,
+.end-phase-info div:last-child {
+  margin-bottom: 0;
+}

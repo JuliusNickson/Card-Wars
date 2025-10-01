@@ -1,0 +1,253 @@
+.hex-tile {
+  position: relative;
+  width: 52px; /* √3 * 30px ≈ 52px for proper hex geometry */
+  height: 60px; /* 2 * 30px = 60px for proper hex geometry */
+  margin: 0;
+  background: #e0e0e0;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 1;
+}
+
+/* Create hexagonal border using pseudo-elements */
+.hex-tile::before {
+  content: "";
+  position: absolute;
+  width: 52px; /* Match hex width for proper geometry */
+  height: 60px; /* Match hex height for proper geometry */
+  top: 0;
+  left: 0;
+  background: transparent;
+  border: 1px solid #000000;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  z-index: 2;
+}
+
+.hex-tile::after {
+  /* Hide this one as we only need one border */
+  display: none;
+}
+
+/* Create the actual hexagonal shape for the background */
+.hex-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: inherit;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hex-tile:hover {
+  transform: scale(1.05);
+  z-index: 10;
+}
+
+.hex-tile:hover .hex-inner {
+  background: #f0f0f0;
+}
+
+.hex-tile:hover::before {
+  border-color: #000000;
+}
+
+/* Owner colors with true hexagonal borders */
+.hex-tile.owner-A .hex-inner {
+  background: #4a90e2;
+}
+
+.hex-tile.owner-A::before {
+  border-color: #000000;
+}
+
+.hex-tile.owner-B .hex-inner {
+  background: #e74c3c;
+}
+
+.hex-tile.owner-B::before {
+  border-color: #000000;
+}
+
+/* Neutral hexes with gray color */
+.hex-tile:not(.owner-A):not(.owner-B) .hex-inner {
+  background: #95a5a6; /* Gray color for neutral zone */
+}
+
+/* Tower domain effect */
+.hex-tile.in-tower-domain .hex-inner {
+  box-shadow: inset 0 0 10px rgba(230, 126, 34, 0.3);
+}
+
+.hex-tile.in-tower-domain::before {
+  border-color: #e67e22;
+}
+
+/* Tower styling with hexagonal borders */
+.hex-tile.is-tower .hex-inner {
+  background: #8b4513;
+}
+
+.hex-tile.is-tower::before {
+  border: 2px solid #000000;
+}
+
+/* Creature styling with hexagonal borders */
+.hex-tile.has-creature::before {
+  border: 2px solid #ffd700;
+}
+
+.hex-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: inherit;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hex-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 12px;
+  color: white;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+.tower-icon {
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+
+.creature-icon {
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+/* Selection and targeting styles with true hex borders */
+.hex-tile.selected::before {
+  border: 3px solid #f1c40f;
+}
+
+.hex-tile.selected {
+  box-shadow: 0 0 15px rgba(241, 196, 15, 0.6);
+  transform: scale(1.1);
+  z-index: 20;
+}
+
+.hex-tile.selected-creature::before {
+  border: 3px solid #e67e22;
+}
+
+.hex-tile.selected-creature {
+  box-shadow: 0 0 15px rgba(230, 126, 34, 0.6);
+  transform: scale(1.1);
+  z-index: 20;
+}
+
+.hex-tile.valid-target::before {
+  border: 2px solid #2ecc71;
+  animation: pulse-green-border 1.5s infinite;
+}
+
+.hex-tile.valid-target {
+  z-index: 15;
+}
+
+.hex-tile.valid-move::before {
+  border: 2px solid #3498db;
+  animation: pulse-blue-border 1.5s infinite;
+}
+
+.hex-tile.valid-move {
+  z-index: 15;
+}
+
+.hex-tile.valid-attack::before {
+  border: 2px solid #e74c3c;
+  animation: pulse-red-border 1.5s infinite;
+}
+
+.hex-tile.valid-attack {
+  z-index: 15;
+}
+
+@keyframes pulse-green-border {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px rgba(46, 204, 113, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(46, 204, 113, 0.8));
+  }
+}
+
+@keyframes pulse-blue-border {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px rgba(52, 152, 219, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(52, 152, 219, 0.8));
+  }
+}
+
+@keyframes pulse-red-border {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px rgba(231, 76, 60, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(231, 76, 60, 0.8));
+  }
+}
+
+.coords-display {
+  font-size: 8px;
+  opacity: 0.7;
+}
+
+.creature-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 8px;
+  margin-top: 2px;
+}
+
+.creature-health {
+  color: white;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.7);
+}
+
+.action-indicator {
+  font-size: 6px;
+  font-weight: bold;
+  margin-top: 1px;
+  padding: 1px 2px;
+  border-radius: 2px;
+}
+
+.action-indicator.moved {
+  background: #3498db;
+  color: white;
+}
+
+.action-indicator.attacked {
+  background: #e74c3c;
+  color: white;
+}
+
+.domain-indicator {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 10px;
+  color: #e67e22;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.7);
+}
