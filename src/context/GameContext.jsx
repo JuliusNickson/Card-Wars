@@ -117,6 +117,34 @@ function isInTowerDomain(hexCoords, board) {
   });
 }
 
+// Helper function to find Stone Defender protecting a target
+function findProtectingStoneDefender(targetPosition, targetOwner, creatures, board) {
+  // Stone Defender protects allies within 2 spaces that are "behind" it
+  // For simplicity, we'll check all Stone Defenders of the same owner within 2 range
+  return Object.values(creatures).find(creature => {
+    if (creature.type === 'stone_defender' && 
+        creature.owner === targetOwner && 
+        creature.position) {
+      
+      const defenderHex = board[creature.position];
+      const targetHex = board[targetPosition];
+      
+      if (defenderHex && targetHex) {
+        const distance = calculateHexDistance(defenderHex.coords, targetHex.coords);
+        return distance <= 2; // Within protection range
+      }
+    }
+    return false;
+  });
+}
+
+// Helper function to check if a hex has an enemy creature on it
+function hasEnemyCreature(hexKey, playerOwner, creatures) {
+  return Object.values(creatures).some(creature => {
+    return creature.position === hexKey && creature.owner !== playerOwner;
+  });
+}
+
 // Initial game state
 const initialGameState = {
   turn: 1,
@@ -228,16 +256,19 @@ function gameReducer(state, action) {
           const hexKey = creature.position;
           const adjacentHexes = getAdjacentHexes(updatedBoard[hexKey].coords, updatedBoard);
           
-          // Mark hex for capture
-          if (updatedBoard[hexKey].owner !== creature.owner && !updatedBoard[hexKey].isTower) {
+          // Mark hex for capture (only if no enemy creature is on it)
+          if (updatedBoard[hexKey].owner !== creature.owner && 
+              !updatedBoard[hexKey].isTower &&
+              !hasEnemyCreature(hexKey, creature.owner, updatedCreaturesAfterTower)) {
             captureProcessing[hexKey] = creature.owner;
           }
           
-          // Mark adjacent hexes for capture (adjacency spread) - but not in tower domains
+          // Mark adjacent hexes for capture (adjacency spread) - but not in tower domains or with enemy creatures
           adjacentHexes.forEach(adjKey => {
             if (updatedBoard[adjKey].owner !== creature.owner && 
                 !updatedBoard[adjKey].isTower &&
-                !isInTowerDomain(updatedBoard[adjKey].coords, updatedBoard)) {
+                !isInTowerDomain(updatedBoard[adjKey].coords, updatedBoard) &&
+                !hasEnemyCreature(adjKey, creature.owner, updatedCreaturesAfterTower)) {
               captureProcessing[adjKey] = creature.owner;
             }
           });
@@ -267,18 +298,22 @@ function gameReducer(state, action) {
         }
       });
       
+      // Calculate controlled hexes for mana gain
+      const updatedControlledHexes = getControlledHexes(updatedBoard);
+      const playerControlledHexCount = updatedControlledHexes[nextPlayer]?.length || 0;
+      
       return {
         ...state,
         turn: state.turn + 1,
         currentPlayer: nextPlayer,
         creatures: updatedCreaturesAfterTower,
         board: updatedBoard,
-        controlledHexes: getControlledHexes(updatedBoard),
+        controlledHexes: updatedControlledHexes,
         mana: {
           ...state.mana,
           [nextPlayer]: Math.min(
-            state.mana[nextPlayer] + 2, 
-            20
+            state.mana[nextPlayer] + playerControlledHexCount, 
+            100
           )
         },
         selectedHex: null,
@@ -532,16 +567,35 @@ function gameReducer(state, action) {
       
       const attackUpdatedCreatures = { ...state.creatures };
       
-      // Apply damage
-      const newTargetHealth = target.health - attacker.attack;
+      // Check for Stone Defender protection
+      const protectingStoneDefender = findProtectingStoneDefender(
+        targetPosition, 
+        target.owner, 
+        state.creatures, 
+        state.board
+      );
+      
+      let finalTarget = target;
+      let finalTargetId = targetId;
+      let finalTargetPosition = targetPosition;
+      
+      // If protected by Stone Defender, redirect damage
+      if (protectingStoneDefender) {
+        finalTarget = protectingStoneDefender;
+        finalTargetId = protectingStoneDefender.id;
+        finalTargetPosition = protectingStoneDefender.position;
+      }
+      
+      // Apply damage to final target (original target or Stone Defender)
+      const newTargetHealth = finalTarget.health - attacker.attack;
       
       if (newTargetHealth <= 0) {
-        // Target dies
-        delete attackUpdatedCreatures[targetId];
+        // Final target dies
+        delete attackUpdatedCreatures[finalTargetId];
         const updatedBoardAfterAttack = {
           ...state.board,
-          [targetPosition]: {
-            ...state.board[targetPosition],
+          [finalTargetPosition]: {
+            ...state.board[finalTargetPosition],
             creatureId: null
           }
         };
@@ -561,9 +615,9 @@ function gameReducer(state, action) {
           validTargets: []
         };
       } else {
-        // Target survives
-        attackUpdatedCreatures[targetId] = {
-          ...target,
+        // Final target survives
+        attackUpdatedCreatures[finalTargetId] = {
+          ...finalTarget,
           health: newTargetHealth
         };
         
@@ -597,12 +651,19 @@ function gameReducer(state, action) {
           state.board
         );
       } else if (mode === 'attack' && !selectedCreature.hasAttacked) {
-        validTargets = getValidAttackTargets(
+        const potentialTargets = getValidAttackTargets(
           state.board[selectedCreature.position].coords,
           selectedCreature.range,
           state.board,
           selectedCreature.owner
         );
+        
+        // Filter to only include hexes with enemy creatures
+        validTargets = potentialTargets.filter(hexKey => {
+          const hex = state.board[hexKey];
+          const creature = state.creatures[hex.creatureId];
+          return creature && creature.owner !== selectedCreature.owner;
+        });
       }
       
       return {

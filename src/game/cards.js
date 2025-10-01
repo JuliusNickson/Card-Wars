@@ -4,7 +4,10 @@ export const CREATURE_TYPES = {
   WARRIOR: 'warrior',
   ARCHER: 'archer',
   MAGE: 'mage',
-  SCOUT: 'scout'
+  SCOUT: 'scout',
+  GELATINOUS_CUBE: 'gelatinous_cube',
+  SHIELD_GUARDIAN: 'shield_guardian',
+  STONE_DEFENDER: 'stone_defender'
 };
 
 export const CARD_TYPES = {
@@ -26,7 +29,8 @@ export const CREATURES = {
     canCapture: true,
     archetype: 'Tank',
     description: 'A sturdy melee fighter with Tank guarding',
-    icon: '⚔️'
+    icon: '⚔️',
+    image: '/images/creatures/warrior.png'
   },
   [CREATURE_TYPES.ARCHER]: {
     id: CREATURE_TYPES.ARCHER,
@@ -40,7 +44,8 @@ export const CREATURES = {
     canCapture: true,
     archetype: 'Ranged',
     description: 'Ranged unit with quick strikes',
-    icon: '🏹'
+    icon: '🏹',
+    image: '/images/creatures/archer.png'
   },
   [CREATURE_TYPES.MAGE]: {
     id: CREATURE_TYPES.MAGE,
@@ -54,7 +59,8 @@ export const CREATURES = {
     canCapture: false,
     archetype: 'Support',
     description: 'Magical support unit (cannot capture)',
-    icon: '🔮'
+    icon: '🔮',
+    image: '/images/creatures/mage.png'
   },
   [CREATURE_TYPES.SCOUT]: {
     id: CREATURE_TYPES.SCOUT,
@@ -68,7 +74,53 @@ export const CREATURES = {
     canCapture: true,
     archetype: 'Fast',
     description: 'Fast, cheap unit for exploration',
-    icon: '👁️'
+    icon: '👁️',
+    image: '/images/creatures/scout.png'
+  },
+  [CREATURE_TYPES.GELATINOUS_CUBE]: {
+    id: CREATURE_TYPES.GELATINOUS_CUBE,
+    name: 'Gelatinous Cube',
+    type: CARD_TYPES.CREATURE,
+    manaCost: 4,
+    attack: 2,
+    health: 10,
+    speed: 1,
+    range: 1,
+    canCapture: true,
+    archetype: 'Tank',
+    description: 'Engulf stun makes it strong at low speed',
+    icon: '🟩',
+    image: '/images/creatures/gelatinous_cube.png'
+  },
+  [CREATURE_TYPES.SHIELD_GUARDIAN]: {
+    id: CREATURE_TYPES.SHIELD_GUARDIAN,
+    name: 'Shield Guardian',
+    type: CARD_TYPES.CREATURE,
+    manaCost: 6,
+    attack: 3,
+    health: 14,
+    speed: 1,
+    range: 1,
+    canCapture: true,
+    archetype: 'Tank',
+    description: 'Can redirect damage — higher cost',
+    icon: '🛡️',
+    image: '/images/creatures/shield_guardian.png'
+  },
+  [CREATURE_TYPES.STONE_DEFENDER]: {
+    id: CREATURE_TYPES.STONE_DEFENDER,
+    name: 'Stone Defender',
+    type: CARD_TYPES.CREATURE,
+    manaCost: 5,
+    attack: 3,
+    health: 12,
+    speed: 1,
+    range: 1,
+    canCapture: true,
+    archetype: 'Tank',
+    description: 'Redirects damage from allies within 2 spaces to itself',
+    icon: '🗿',
+    image: '/images/creatures/stone_defender.png'
   }
 };
 
@@ -78,7 +130,9 @@ export const DEFAULT_HAND = [
   CREATURE_TYPES.ARCHER,
   CREATURE_TYPES.MAGE,
   CREATURE_TYPES.SCOUT,
-  CREATURE_TYPES.WARRIOR
+  CREATURE_TYPES.GELATINOUS_CUBE,
+  CREATURE_TYPES.SHIELD_GUARDIAN,
+  CREATURE_TYPES.STONE_DEFENDER
 ];
 
 // Helper functions
@@ -155,8 +209,10 @@ export const getValidAttackTargets = (fromPosition, range, board, attackerOwner)
   Object.entries(board).forEach(([key, hex]) => {
     const distance = calculateHexDistance(fromPosition, hex.coords);
     
-    // Valid if within range and has enemy creature
-    if (distance <= range && distance > 0 && hex.creatureId && hex.owner !== attackerOwner) {
+    // Valid if within range and has enemy creature (check creature owner, not hex owner)
+    if (distance <= range && distance > 0 && hex.creatureId) {
+      // We need to get the creature data to check its owner
+      // This will be handled by the calling code that has access to creatures
       validTargets.push(key);
     }
   });

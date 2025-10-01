@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useGame } from '../../context/GameContext';
 import { TOWER_DEFINITIONS } from '../../game/towers';
+import { getCreatureById } from '../../game/cards';
 import './HexTile.css';
 
 const HexTile = ({ 
@@ -16,6 +17,7 @@ const HexTile = ({
   isInTowerDomain
 }) => {
   const { gameState, actions, helpers } = useGame();
+  const [imageError, setImageError] = useState(false);
   
   const handleClick = () => {
     if (onClick) {
@@ -85,12 +87,30 @@ const HexTile = ({
     const creature = getCreatureData();
     if (!creature) return '⚔️';
     
-    // Return creature icon based on type
+    // Get creature template data
+    const creatureTemplate = getCreatureById(creature.type);
+    
+    // If creature has image and no error, try to show image
+    if (creatureTemplate && creatureTemplate.image && !imageError) {
+      return (
+        <img 
+          src={creatureTemplate.image} 
+          alt={creature.type}
+          className="creature-token-image"
+          onError={() => setImageError(true)}
+        />
+      );
+    }
+    
+    // Fallback to icon based on type
     switch (creature.type) {
       case 'warrior': return '⚔️';
       case 'archer': return '🏹';
       case 'mage': return '🔮';
       case 'scout': return '👁️';
+      case 'gelatinous_cube': return '🟩';
+      case 'shield_guardian': return '🛡️';
+      case 'stone_defender': return '🗿';
       default: return '⚔️';
     }
   };
