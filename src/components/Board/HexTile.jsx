@@ -28,6 +28,11 @@ const HexTile = ({
   const getHexClass = () => {
     let classes = ['hex-tile'];
     
+    // Add odd-column class for alternating column offset
+    if (coords.x % 2 === 1) {
+      classes.push('odd-column');
+    }
+    
     if (owner) {
       classes.push(`owner-${owner}`);
     }

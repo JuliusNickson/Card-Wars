@@ -1,26 +1,34 @@
 .hex-tile {
   position: relative;
-  width: 52px; /* √3 * 30px ≈ 52px for proper hex geometry */
-  height: 60px; /* 2 * 30px = 60px for proper hex geometry */
+  width: 60px; /* Full hex width */
+  height: 52px; /* Full hex height */
   margin: 0;
-  background: #e0e0e0;
-  border-radius: 0;
+  padding: 0;
+  background: transparent;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease;
   z-index: 1;
+  /* Create hexagonal shape using clip-path */
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+  flex-shrink: 0;
 }
 
-/* Create hexagonal border using pseudo-elements */
+/* Offset every other column vertically by half a hex height */
+.hex-tile.odd-column {
+  transform: translateY(26px); /* Half the hex height (52px/2) */
+}
+
+/* Create honeycomb border effect - removed borders for seamless tessellation */
 .hex-tile::before {
   content: "";
   position: absolute;
-  width: 52px; /* Match hex width for proper geometry */
-  height: 60px; /* Match hex height for proper geometry */
+  width: 100%;
+  height: 100%;
   top: 0;
   left: 0;
   background: transparent;
-  border: 1px solid #000000;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  border: none;
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
   z-index: 2;
 }
 
@@ -31,27 +39,37 @@
 
 /* Create the actual hexagonal shape for the background */
 .hex-inner {
-  position: relative;
+  position: absolute;
   width: 100%;
   height: 100%;
-  background: inherit;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: #bdc3c7; /* Default neutral color - lighter for honeycomb effect */
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
   display: flex;
   align-items: center;
   justify-content: center;
+  top: 0;
+  left: 0;
+  /* Add subtle outline for definition */
+  box-shadow: inset 0 0 0 0.5px rgba(44, 62, 80, 0.3);
 }
 
 .hex-tile:hover {
-  transform: scale(1.05);
+  transform: scale(1.02);
+  z-index: 10;
+}
+
+.hex-tile.odd-column:hover {
+  transform: translateY(26px) scale(1.02);
   z-index: 10;
 }
 
 .hex-tile:hover .hex-inner {
-  background: #f0f0f0;
+  background: #ecf0f1;
+  box-shadow: inset 0 0 0 1px rgba(52, 73, 94, 0.6);
 }
 
 .hex-tile:hover::before {
-  border-color: #000000;
+  border: 1px solid #34495e;
 }
 
 /* Owner colors with true hexagonal borders */
@@ -99,18 +117,10 @@
   border: 2px solid #ffd700;
 }
 
-.hex-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  background: inherit;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+/* Hex inner is already defined above, removing duplicate */
 
 .hex-content {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -119,6 +129,9 @@
   font-size: 12px;
   color: white;
   text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+  width: 100%;
+  height: 100%;
+  z-index: 3;
 }
 
 .tower-icon {
@@ -144,29 +157,39 @@
   margin-bottom: 2px;
 }
 
-/* Selection and targeting styles with true hex borders */
+/* Selection and targeting styles with honeycomb borders */
 .hex-tile.selected::before {
-  border: 3px solid #f1c40f;
+  border: 2px solid #f1c40f;
+  filter: drop-shadow(0 0 8px rgba(241, 196, 15, 0.6));
 }
 
 .hex-tile.selected {
-  box-shadow: 0 0 15px rgba(241, 196, 15, 0.6);
-  transform: scale(1.1);
+  transform: scale(1.05);
+  z-index: 20;
+}
+
+.hex-tile.odd-column.selected {
+  transform: translateY(26px) scale(1.05);
   z-index: 20;
 }
 
 .hex-tile.selected-creature::before {
-  border: 3px solid #e67e22;
+  border: 2px solid #e67e22;
+  filter: drop-shadow(0 0 8px rgba(230, 126, 34, 0.6));
 }
 
 .hex-tile.selected-creature {
-  box-shadow: 0 0 15px rgba(230, 126, 34, 0.6);
-  transform: scale(1.1);
+  transform: scale(1.05);
+  z-index: 20;
+}
+
+.hex-tile.odd-column.selected-creature {
+  transform: translateY(26px) scale(1.05);
   z-index: 20;
 }
 
 .hex-tile.valid-target::before {
-  border: 2px solid #2ecc71;
+  border: 1.5px solid #2ecc71;
   animation: pulse-green-border 1.5s infinite;
 }
 
@@ -175,7 +198,7 @@
 }
 
 .hex-tile.valid-move::before {
-  border: 2px solid #3498db;
+  border: 1.5px solid #3498db;
   animation: pulse-blue-border 1.5s infinite;
 }
 
@@ -184,7 +207,7 @@
 }
 
 .hex-tile.valid-attack::before {
-  border: 2px solid #e74c3c;
+  border: 1.5px solid #e74c3c;
   animation: pulse-red-border 1.5s infinite;
 }
 
@@ -258,8 +281,8 @@
 
 .domain-indicator {
   position: absolute;
-  top: 2px;
-  right: 2px;
+  top: 4px;
+  right: 8px;
   font-size: 10px;
   color: #e67e22;
   text-shadow: 1px 1px 1px rgba(0,0,0,0.7);

@@ -1,7 +1,7 @@
 .board-container {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   padding: 20px;
   background: #2c3e50;
   min-height: calc(100vh - 200px);
@@ -10,24 +10,18 @@
 }
 
 .hex-grid {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: -15px; /* Vertical spacing for flat-topped hex tessellation */
+  display: grid;
+  grid-template-columns: repeat(16, 48px); /* Full hex width - no overlap */
+  grid-auto-rows: 52px; /* Full hex height - no overlap */
+  gap: 0;
+  justify-content: center;
+  align-content: center;
 }
 
-.hex-row {
-  display: flex;
-  gap: -1px; /* Minimal horizontal gap for perfect tessellation */
-  align-items: center;
-}
-
-.hex-row.odd-row {
-  margin-left: 26px; /* Half the hex width (52px/2) for proper offset */
-}
-
-.hex-row.even-row {
-  margin-left: 0;
+/* Position hexes in a honeycomb pattern using CSS Grid */
+.hex-grid .hex-tile {
+  position: relative;
+  z-index: 1;
 }
 
 .board-info {
