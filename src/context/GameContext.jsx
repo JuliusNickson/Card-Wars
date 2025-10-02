@@ -108,8 +108,8 @@ function getControlledHexes(board) {
 // Helper function to check if a hex is within a tower's domain (2 hex range)
 function isInTowerDomain(hexCoords, board) {
   const towerPositions = [
-    { x: 0, y: 0 }, { x: 11, y: 0 },
-    { x: 0, y: 7 }, { x: 11, y: 7 }
+    { x: 0, y: 0 }, { x: 15, y: 0 },
+    { x: 0, y: 7 }, { x: 15, y: 7 }
   ];
   
   return towerPositions.some(tower => {

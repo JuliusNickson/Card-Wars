@@ -167,20 +167,20 @@ export const createCreatureInstance = (creatureType, owner, position) => {
 
 // Movement and range calculation utilities
 export const calculateHexDistance = (from, to) => {
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
+  // Convert zigzag column coordinates to axial coordinates
+  // In our grid: odd columns (x % 2 === 1) are offset down by half a hex
   
-  // For flat-topped hex grid (offset coordinates)
-  // Convert to axial coordinates for proper distance calculation
   const fromAxial = {
-    q: from.x - Math.floor(from.y / 2),
-    r: from.y
-  };
-  const toAxial = {
-    q: to.x - Math.floor(to.y / 2), 
-    r: to.y
+    q: from.x,
+    r: from.y - Math.floor(from.x / 2)
   };
   
+  const toAxial = {
+    q: to.x,
+    r: to.y - Math.floor(to.x / 2)
+  };
+  
+  // Calculate hex distance using axial coordinates
   return (Math.abs(fromAxial.q - toAxial.q) + 
           Math.abs(fromAxial.q + fromAxial.r - toAxial.q - toAxial.r) + 
           Math.abs(fromAxial.r - toAxial.r)) / 2;
@@ -220,28 +220,54 @@ export const getValidAttackTargets = (fromPosition, range, board, attackerOwner)
   return validTargets;
 };
 
+// Get the exact 6 neighbor positions for a hex in our zigzag grid
+// Using proper hexagonal directions: top, bottom, left-upper, left-lower, right-upper, right-lower
+export const getHexNeighborPositions = (position) => {
+  const { x, y } = position;
+  const isOddColumn = x % 2 === 1;
+  
+  if (isOddColumn) {
+    // Odd columns - based on (9,5) example -> [8,5 8,6 9,4 10,5 9,6 10,6]
+    return [
+      { x: x, y: y - 1 },     // top
+      { x: x, y: y + 1 },     // bottom
+      { x: x - 1, y: y },     // left-upper
+      { x: x - 1, y: y + 1 }, // left-lower
+      { x: x + 1, y: y },     // right-upper
+      { x: x + 1, y: y + 1 }  // right-lower
+    ];
+  } else {
+    // Even columns - hexagonal directions
+    return [
+      { x: x, y: y - 1 },     // top
+      { x: x, y: y + 1 },     // bottom
+      { x: x - 1, y: y - 1 }, // left-upper
+      { x: x - 1, y: y },     // left-lower
+      { x: x + 1, y: y - 1 }, // right-upper
+      { x: x + 1, y: y }      // right-lower
+    ];
+  }
+};
+
+// Check if two hexes share an edge (are truly adjacent)
+export const areHexesAdjacent = (pos1, pos2) => {
+  // Same hex is not adjacent to itself
+  if (pos1.x === pos2.x && pos1.y === pos2.y) return false;
+  
+  // Get all neighbors of pos1 and check if pos2 is among them
+  const neighbors = getHexNeighborPositions(pos1);
+  return neighbors.some(neighbor => 
+    neighbor.x === pos2.x && neighbor.y === pos2.y
+  );
+};
+
 export const getAdjacentHexes = (position, board) => {
   const adjacent = [];
-  const { x, y } = position;
+  const neighborPositions = getHexNeighborPositions(position);
   
-  // Hex neighbors for flat-topped orientation
-  const neighborOffsets = [
-    [-1, 0], [1, 0],        // Left, Right
-    [0, -1], [0, 1],        // Up, Down
-    [-1, -1], [-1, 1]       // Up-left, Down-left (for even rows)
-  ];
-  
-  // Adjust for odd/even row offset
-  if (y % 2 === 1) {
-    neighborOffsets[4] = [0, -1];  // Up-right for odd rows
-    neighborOffsets[5] = [0, 1];   // Down-right for odd rows
-  }
-  
-  neighborOffsets.forEach(([dx, dy]) => {
-    const nx = x + dx;
-    const ny = y + dy;
-    const key = `${nx},${ny}`;
-    
+  // Check each neighbor position to see if it exists in the board
+  neighborPositions.forEach(neighbor => {
+    const key = `${neighbor.x},${neighbor.y}`;
     if (board[key]) {
       adjacent.push(key);
     }
