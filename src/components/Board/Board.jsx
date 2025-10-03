@@ -57,63 +57,57 @@ const Board = ({ gameState, onHexClick, isValidSummoningTarget }) => {
     }
   };
 
-  const renderRow = (rowIndex) => {
+  const renderHexGrid = () => {
     const tiles = [];
-    const isOddRow = rowIndex % 2 === 1;
     
-    for (let x = 0; x < BOARD_WIDTH; x++) {
-      const key = `${x},${rowIndex}`;
-      const hexData = boardData[key] || {
-        owner: null,
-        creatureId: null,
-        isTower: false,
-        coords: { x, y: rowIndex }
-      };
-
-      const isSelected = gameState?.selectedHex === key;
-      const isValidTarget = isValidSummoningTarget && isValidSummoningTarget(key);
-      const isSelectedCreature = gameState?.selectedCreature === hexData.creatureId;
-      const hexInTowerDomain = isInTowerDomain(hexData.coords);
-
-      tiles.push(
-        <HexTile
-          key={key}
-          owner={hexData.owner}
-          creatureId={hexData.creatureId}
-          isTower={hexData.isTower}
-          towerType={hexData.towerType}
-          coords={hexData.coords}
-          onClick={handleHexClick}
-          selected={isSelected}
-          isValidTarget={isValidTarget}
-          isSelectedCreature={isSelectedCreature}
-          isInTowerDomain={hexInTowerDomain}
-        />
-      );
-    }
-
-    return (
-      <div 
-        key={rowIndex} 
-        className={`hex-row ${isOddRow ? 'odd-row' : 'even-row'}`}
-      >
-        {tiles}
-      </div>
-    );
-  };
-
-  const renderBoard = () => {
-    const rows = [];
     for (let y = 0; y < BOARD_HEIGHT; y++) {
-      rows.push(renderRow(y));
+      for (let x = 0; x < BOARD_WIDTH; x++) {
+        const key = `${x},${y}`;
+        const hexData = boardData[key] || {
+          owner: null,
+          creatureId: null,
+          isTower: false,
+          coords: { x, y }
+        };
+
+        const isSelected = gameState?.selectedHex === key;
+        const isValidTarget = isValidSummoningTarget && isValidSummoningTarget(key);
+        const isSelectedCreature = gameState?.selectedCreature === hexData.creatureId;
+        const hexInTowerDomain = isInTowerDomain(hexData.coords);
+
+        // Calculate grid position for honeycomb layout
+        const gridColumn = x + 1;
+        const gridRow = y * 2 + (x % 2) + 1; // Offset every other column
+
+        tiles.push(
+          <HexTile
+            key={key}
+            owner={hexData.owner}
+            creatureId={hexData.creatureId}
+            isTower={hexData.isTower}
+            towerType={hexData.towerType}
+            coords={hexData.coords}
+            onClick={handleHexClick}
+            selected={isSelected}
+            isValidTarget={isValidTarget}
+            isSelectedCreature={isSelectedCreature}
+            isInTowerDomain={hexInTowerDomain}
+            style={{
+              gridColumn: gridColumn,
+              gridRow: gridRow
+            }}
+          />
+        );
+      }
     }
-    return rows;
+
+    return tiles;
   };
 
   return (
     <div className="board-container">
       <div className="hex-grid">
-        {renderBoard()}
+        {renderHexGrid()}
       </div>
       {gameState && (
         <div className="board-info">
