@@ -173,6 +173,12 @@ const initialGameState = {
   hands: {
     A: [...DEFAULT_HAND],
     B: [...DEFAULT_HAND]
+  },
+  // Timer state
+  phaseTimer: {
+    timeRemaining: 20, // seconds
+    isActive: false,
+    startTime: null
   }
 };
 
@@ -323,14 +329,24 @@ function gameReducer(state, action) {
         actionMode: null,
         validTargets: [],
         turnPhase: 'upkeep',
-        lastTowerDamage: towerDamageResults
+        lastTowerDamage: towerDamageResults,
+        phaseTimer: {
+          timeRemaining: 0,
+          isActive: false,
+          startTime: null
+        }
       };
 
     case GAME_ACTIONS.SET_TURN_PHASE:
       const { phase } = action.payload;
       return {
         ...state,
-        turnPhase: phase
+        turnPhase: phase,
+        phaseTimer: {
+          timeRemaining: phase === 'main' ? 20 : 0,
+          isActive: phase === 'main',
+          startTime: phase === 'main' ? Date.now() : null
+        }
       };
 
     case GAME_ACTIONS.MOVE_CREATURE:
@@ -676,6 +692,31 @@ function gameReducer(state, action) {
         selectedCardType: null
       };
 
+    case GAME_ACTIONS.UPDATE_TIMER:
+      const { timeRemaining } = action.payload;
+      return {
+        ...state,
+        phaseTimer: {
+          ...state.phaseTimer,
+          timeRemaining
+        }
+      };
+
+    case GAME_ACTIONS.END_MAIN_PHASE_EARLY:
+      // End main phase early when player clicks end turn
+      if (state.turnPhase === 'main') {
+        return {
+          ...state,
+          turnPhase: 'end',
+          phaseTimer: {
+            timeRemaining: 0,
+            isActive: false,
+            startTime: null
+          }
+        };
+      }
+      return state;
+
     default:
       return state;
   }
@@ -821,6 +862,18 @@ export const GameProvider = ({ children }) => {
     return gameState.validTargets.includes(hexKey);
   };
 
+  // Timer action functions
+  const updateTimer = (timeRemaining) => {
+    dispatch({
+      type: GAME_ACTIONS.UPDATE_TIMER,
+      payload: { timeRemaining }
+    });
+  };
+
+  const endMainPhaseEarly = () => {
+    dispatch({ type: GAME_ACTIONS.END_MAIN_PHASE_EARLY });
+  };
+
   const value = {
     gameState,
     dispatch,
@@ -840,7 +893,9 @@ export const GameProvider = ({ children }) => {
       selectCreature,
       attackCreature,
       setTurnPhase,
-      advanceTurnPhase
+      advanceTurnPhase,
+      updateTimer,
+      endMainPhaseEarly
     },
     helpers: {
       isValidSummoningTarget,

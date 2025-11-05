@@ -1,9 +1,35 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useGame } from '../../context/GameContext';
 import './TurnPhasePanel.css';
 
 const TurnPhasePanel = () => {
   const { gameState, actions, helpers } = useGame();
+  const timerRef = useRef(null);
+  
+  // Timer effect for main phase
+  useEffect(() => {
+    if (gameState.turnPhase === 'main' && gameState.phaseTimer.isActive) {
+      timerRef.current = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - gameState.phaseTimer.startTime) / 1000);
+        const remaining = Math.max(0, 20 - elapsed);
+        
+        actions.updateTimer(remaining);
+        
+        // Auto advance when timer reaches 0
+        if (remaining <= 0) {
+          actions.setTurnPhase('end');
+        }
+      }, 1000);
+    }
+    
+    // Cleanup timer when phase changes or component unmounts
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [gameState.turnPhase, gameState.phaseTimer.isActive, gameState.phaseTimer.startTime, actions]);
   
   const getPhaseDescription = (phase) => {
     switch (phase) {
@@ -23,8 +49,8 @@ const TurnPhasePanel = () => {
       // Auto-advance from upkeep to main
       actions.setTurnPhase('main');
     } else if (gameState.turnPhase === 'main') {
-      // Advance to end phase
-      actions.setTurnPhase('end');
+      // End main phase early
+      actions.endMainPhaseEarly();
     } else if (gameState.turnPhase === 'end') {
       // End turn
       actions.endTurn();
@@ -36,7 +62,7 @@ const TurnPhasePanel = () => {
       case 'upkeep':
         return 'Start Main Phase';
       case 'main':
-        return 'End Main Phase';
+        return 'End Turn Early';
       case 'end':
         return 'End Turn';
       default:
@@ -60,6 +86,18 @@ const TurnPhasePanel = () => {
   
   const { canMove, canAttack } = getActionsRemaining();
   
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+  
+  const getTimerClass = () => {
+    if (gameState.phaseTimer.timeRemaining <= 5) return 'timer-critical';
+    if (gameState.phaseTimer.timeRemaining <= 10) return 'timer-warning';
+    return 'timer-normal';
+  };
+  
   return (
     <div className="turn-phase-panel">
       <div className="phase-header">
@@ -70,6 +108,15 @@ const TurnPhasePanel = () => {
           </span>
         </div>
       </div>
+      
+      {gameState.turnPhase === 'main' && (
+        <div className="timer-display">
+          <div className={`timer-circle ${getTimerClass()}`}>
+            <span className="timer-text">{formatTime(gameState.phaseTimer.timeRemaining)}</span>
+          </div>
+          <div className="timer-label">Time Remaining</div>
+        </div>
+      )}
       
       <div className="phase-description">
         {getPhaseDescription(gameState.turnPhase)}
